@@ -3,6 +3,8 @@
 
 open System
 open CommandLine
+open Renamer
+open AdvancedFuncs
 
 type ColorEnum = Red=0 | Yellow=1 | Blue=2      // enum 
 
@@ -14,6 +16,9 @@ type options = {
 
 [<EntryPoint>]
 let main argv =
-    
+    let files = getFiles "C:\Users\leandro.vieira\Desktop\idempotnece" "png" <| bool.Parse "true"
+    let funcs = [ insertEnd "xxx" ; removeOccurrence "OS" ; removeByIndex 0 1 ]
+    project files funcs
+    |> List.iter (printfn "%A")
     0 // return an integer exit code
 
