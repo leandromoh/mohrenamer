@@ -16,9 +16,22 @@ type options = {
 
 [<EntryPoint>]
 let main argv =
-    let files = getFiles "C:\Users\leandro.vieira\Desktop\idempotnece" "png" <| bool.Parse "true"
-    let funcs = [ insertEnd "xxx" ; removeOccurrence "OS" ; removeByIndex 0 1 ]
-    project files funcs
-    |> List.iter (printfn "%A")
-    0 // return an integer exit code
-
+    let dirName, extension, recursive = ("C:\Users\leandro.vieira\Desktop\idempotnece", "png", bool.Parse "true")
+    let files = getFiles dirName extension recursive
+    let funcs = [ insertEnd "xxx" ; removeOccurrence "OS" ; removeByIndex 0 0 ]
+    let projection = project files funcs
+    projection |> List.iter (fun f -> printfn "%A\n%A\n" f.OldPath f.NewPath)
+    printfn "want to renames? (y/n)"
+    match Console.ReadLine() with
+    | "y" -> 
+        match hasNewNameConflicts projection with
+        | false -> 
+            rename projection
+            printfn "arquivos renomeados"
+            0
+        | _ -> 
+            printfn "nao é possivel renomear pois haverá arquivos com nomes repetido"
+            1
+    | _ -> 
+        printfn "entao tchau"
+        1
