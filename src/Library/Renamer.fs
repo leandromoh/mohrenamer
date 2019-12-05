@@ -2,15 +2,22 @@ module Renamer
 
 open System.IO
 
+type FileConfiguration =
+  { DirectoryName: string
+    OldName: string
+    NewName: string }
+
 let project files funcs =
     let processName fileName = List.fold (fun name f -> f name) fileName funcs
-    let getProjection (file:FileInfo) = (file.DirectoryName, file.Name, processName file.Name) 
+    let getProjection (file:FileInfo) = { DirectoryName = file.DirectoryName 
+                                          OldName = file.Name
+                                          NewName = processName file.Name }
     files |> List.map getProjection
 
 let rename files =
-    let move (dirName, oldName, newName) = 
-        let oldPath = Path.Combine(dirName, oldName)
-        let newPath = Path.Combine(dirName, newName)
+    let move file = 
+        let oldPath = Path.Combine(file.DirectoryName, file.OldName)
+        let newPath = Path.Combine(file.DirectoryName, file.NewName)
         File.Move(oldPath, newPath)
     List.iter move files
 
