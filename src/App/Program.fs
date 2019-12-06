@@ -22,16 +22,11 @@ let main argv =
     let projection = project files funcs
     projection |> List.iter (fun f -> printfn "%A\n%A\n" f.OldPath f.NewPath)
     printfn "want to renames? (y/n)"
-    match Console.ReadLine() with
-    | "y" -> 
-        match hasNewNameConflicts projection with
-        | false -> 
-            rename projection
-            printfn "arquivos renomeados"
-            0
-        | _ -> 
-            printfn "nao é possivel renomear pois haverá arquivos com nomes repetido"
-            1
-    | _ -> 
-        printfn "entao tchau"
-        1
+    match Console.ReadLine(), lazy(hasNewNameConflicts projection) with
+    | "y", x when not x.Value -> rename projection
+                                 printfn "arquivos renomeados"
+                                 0
+    | "y", _ ->                  printfn "nao é possivel renomear pois haverá arquivos com nomes repetido"
+                                 1
+    | _ ->                       printfn "entao tchau"
+                                 1
