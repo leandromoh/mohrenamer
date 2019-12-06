@@ -11,12 +11,16 @@ type FileConfiguration =
     member this.OldPath = Path.Combine(this.DirectoryName, this.OldName)
     member this.NewPath = Path.Combine(this.DirectoryName, this.NewName)
 
-let project files funcs =
-    let processName fileName = List.fold (|>) fileName funcs
-    let getProjection (file: FileInfo) = { DirectoryName = file.DirectoryName 
-                                           OldName = file.Name
-                                           NewName = processName file.Name }
-    files |> List.map getProjection
+let processFileName fileName funcs = 
+    let name = Path.GetFileNameWithoutExtension(fileName)
+    let ext = Path.GetExtension(fileName)
+    let newName = List.fold (|>) name funcs
+    newName + ext 
+
+let project (files: FileInfo list) funcs =
+    files |> List.map (fun f -> { DirectoryName = f.DirectoryName 
+                                  OldName = f.Name
+                                  NewName = processFileName f.Name funcs })
 
 let rename files =
     List.iter 
