@@ -22,8 +22,14 @@ let project (files: FileInfo list) funcs =
                                   OldName = f.Name
                                   NewName = processFileName f.Name funcs })
 
-let rename (files: FileConfiguration list) =
-    files |> List.iter (fun f -> File.Move(f.OldPath, f.NewPath))
+let private rename getNames =
+    List.iter (getNames >> File.Move)
+
+let renameForward =
+    rename (fun f -> f.OldName, f.NewName)
+
+let renameBackward =
+    rename (fun f -> f.NewName, f.OldName)
 
 let hasNewNameConflicts files = 
     List.length files <> MoreEnumerable.DistinctBy(files, fun f -> f.NewName).Count()

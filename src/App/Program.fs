@@ -14,8 +14,16 @@ type options = {
   [<Option('p', "project", HelpText = "Should or not include all subdirectories in a search operation.")>] projection : bool;
 }
 
-[<EntryPoint>]
-let main argv =
+let renames projection = 
+    renameForward projection
+    printfn "arquivos renomeados"
+    printfn "want to revert? (y/n)"
+    match Console.ReadLine() with
+    | "y" -> renameBackward projection
+             0
+    | _ ->   1
+
+let menu =
     let dirName, extension, recursive = ("C:\Users\leandro.vieira\Desktop\idempotnece", "png", bool.Parse "true")
     let files = getFiles dirName extension recursive
     let funcs = [ insertEnd "xxx" ; removeOccurrence "OS" ; removeByIndex 0 0 ]
@@ -23,10 +31,11 @@ let main argv =
     projection |> List.iter (fun f -> printfn "%A\n%A\n" f.OldPath f.NewPath)
     printfn "want to renames? (y/n)"
     match Console.ReadLine(), lazy(hasNewNameConflicts projection) with
-    | "y", x when not x.Value -> rename projection
-                                 printfn "arquivos renomeados"
-                                 0
+    | "y", x when not x.Value -> renames projection
     | "y", _ ->                  printfn "nao é possivel renomear pois haverá arquivos com nomes repetido"
-                                 1
+                                 2
     | _ ->                       printfn "entao tchau"
-                                 1
+                                 3
+
+[<EntryPoint>]
+let main argv = menu
