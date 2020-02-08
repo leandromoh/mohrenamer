@@ -8,7 +8,7 @@ open AdvancedFuncs
 
 type ColorEnum = Red=0 | Yellow=1 | Blue=2      // enum 
 
-type options = {
+type Options = {
   [<Option('d', "directory", Required = true, HelpText = "Source directory of files.")>] directory : string;
   [<Option('r', "recursive", Required = true, HelpText = "Should or not include all subdirectories in a search operation.")>] recursive : bool;
   [<Option('p', "project", HelpText = "Should or not include all subdirectories in a search operation.")>] projection : bool;
@@ -19,15 +19,16 @@ let renames projection =
     printfn "arquivos renomeados"
     printfn "want to revert? (y/n)"
     match Console.ReadLine() with
-    | "y" -> renameBackward projection
+    | "n" -> 1
+    | _ ->   renameBackward projection
              0
-    | _ ->   1
 
 let menu =
-    let dirName, extension, recursive = ("C:\Users\leandro.vieira\Desktop\idempotnece", "png", bool.Parse "true")
+    let dirName, extension, recursive = ("C:\Users\leandro\Desktop\\batata", "txt", bool.Parse "true")
     let files = getFiles dirName extension recursive
     let funcs = [ insertEnd "xxx" ; removeOccurrence "OS" ; removeByIndex 0 0 ]
-    let projection = project files funcs
+    let finalFunc = List.reduce (>>) funcs |> processFileName
+    let projection = project files finalFunc
     projection |> List.iter (fun f -> printfn "%A\n%A\n" f.OldPath f.NewPath)
     printfn "want to renames? (y/n)"
     match Console.ReadLine(), lazy(hasNewNameConflicts projection) with

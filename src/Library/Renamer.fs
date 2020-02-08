@@ -19,14 +19,14 @@ let createRecord dirName oldName newName  =
       NewPath = Path.Combine(dirName, newName)
     }
 
-let processFileName fileName funcs = 
+let processFileName func fileName = 
     let name = Path.GetFileNameWithoutExtension(fileName)
     let ext = Path.GetExtension(fileName)
-    let newName = List.fold (|>) name funcs
+    let newName = func name
     newName + ext 
 
-let project (files: FileInfo list) funcs =
-    files |> List.map (fun f -> createRecord f.DirectoryName f.Name <| processFileName f.Name funcs)
+let project (files: FileInfo list) getNewName =
+    files |> List.map (fun f -> createRecord f.DirectoryName f.Name <| getNewName f.Name)
 
 let private rename getNames =
     List.iter (getNames >> File.Move)
